@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Netling.Core.Models;
@@ -79,9 +80,23 @@ namespace Netling.Core
             {
                 job = await _workerJob.Init(workerIndex, workerThreadResult);
             }
+            catch(WebException ex)
+            {
+                if(ex.Response != null)
+                {
+                    workerThreadResult.AddError((int)sw.ElapsedMilliseconds, 0, false, (int)ex.Status);
+                }
+                else
+                {
+                    workerThreadResult.AddError((int)sw.ElapsedMilliseconds, 0, false, 0);
+                }
+                results.Enqueue(workerThreadResult);
+                resetEvent.Set();
+                return;
+            }
             catch (Exception)
             {
-                workerThreadResult.AddError((int)sw.ElapsedMilliseconds, 0, false);
+                workerThreadResult.AddError((int)sw.ElapsedMilliseconds, 0, false, 0);
                 results.Enqueue(workerThreadResult);
                 resetEvent.Set();
                 return;
@@ -93,9 +108,20 @@ namespace Netling.Core
                 {
                     await job.DoWork();
                 }
+                catch (WebException ex)
+                {
+                    if (ex.Response != null)
+                    {
+                        workerThreadResult.AddError((int)sw.ElapsedMilliseconds, 0, false, (int)ex.Status);
+                    }
+                    else
+                    {
+                        workerThreadResult.AddError((int)sw.ElapsedMilliseconds, 0, false, 0);
+                    }
+                }
                 catch (Exception)
                 {
-                    workerThreadResult.AddError((int)sw.ElapsedMilliseconds, 0, false);
+                    workerThreadResult.AddError((int)sw.ElapsedMilliseconds, 0, false, 0);
                 }
             }
             

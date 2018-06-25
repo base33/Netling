@@ -45,9 +45,9 @@ namespace Netling.Core.HttpClientWorker
                 var responseTime = (float)_localStopwatch.ElapsedTicks / Stopwatch.Frequency * 1000;
 
                 if ((int)response.StatusCode < 400)
-                    _workerThreadResult.Add((int)_stopwatch.ElapsedMilliseconds, length, responseTime, _index < 10);
+                    _workerThreadResult.Add((int)_stopwatch.ElapsedMilliseconds, length, responseTime, _index < 10, (int)response.StatusCode);
                 else
-                    _workerThreadResult.AddError((int)_stopwatch.ElapsedMilliseconds, responseTime, _index < 10);
+                    _workerThreadResult.AddError((int)_stopwatch.ElapsedMilliseconds, responseTime, _index < 10, (int)response.StatusCode);
             }
         }
 

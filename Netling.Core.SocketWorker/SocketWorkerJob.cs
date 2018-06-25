@@ -56,10 +56,10 @@ namespace Netling.Core.SocketWorker
             var length = _httpWorker.Read(out var statusCode);
 
             if (statusCode < 400)
-                _workerThreadResult.Add((int)_stopwatch.ElapsedMilliseconds, length, (float) _localStopwatch.ElapsedTicks / Stopwatch.Frequency * 1000, _index < 10);
+                _workerThreadResult.Add((int)_stopwatch.ElapsedMilliseconds, length, (float) _localStopwatch.ElapsedTicks / Stopwatch.Frequency * 1000, _index < 10, statusCode);
             else
-                _workerThreadResult.AddError((int)_stopwatch.ElapsedMilliseconds, (float) _localStopwatch.ElapsedTicks / Stopwatch.Frequency * 1000, _index < 10);
-
+                _workerThreadResult.AddError((int)_stopwatch.ElapsedMilliseconds, (float) _localStopwatch.ElapsedTicks / Stopwatch.Frequency * 1000, _index < 10, statusCode);
+            
             return Task.CompletedTask;
         }
 

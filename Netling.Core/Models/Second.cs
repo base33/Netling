@@ -9,11 +9,13 @@ namespace Netling.Core.Models
         public long Errors { get; private set; }
         public int Elapsed { get; }
         public List<float> ResponseTimes { get; private set; }
+        public List<int> StatusCodes { get; set; }
 
         public Second(int elapsed)
         {
             Elapsed = elapsed;
             ResponseTimes = new List<float>();
+            StatusCodes = new List<int>();
         }
 
         internal void ClearResponseTimes()
@@ -21,22 +23,26 @@ namespace Netling.Core.Models
             ResponseTimes = new List<float>();
         }
 
-        public void Add(long bytes, float responseTime, bool trackResponseTime)
+        public void Add(long bytes, float responseTime, bool trackResponseTime, int statusCode)
         {
             Count++;
             Bytes += bytes;
 
             if (trackResponseTime)
                 ResponseTimes.Add(responseTime);
+
+            StatusCodes.Add(statusCode);
         }
 
-        public void AddError(float responseTime, bool trackResponseTime)
+        public void AddError(float responseTime, bool trackResponseTime, int statusCode)
         {
             Count++;
             Errors++;
 
             if (trackResponseTime)
                 ResponseTimes.Add(responseTime);
+
+            StatusCodes.Add(statusCode);
         }
 
         public void AddMerged(Second second)

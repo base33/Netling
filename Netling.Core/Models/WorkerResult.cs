@@ -46,13 +46,13 @@ namespace Netling.Core.Models
             RequestsPerSecond = Count / (Elapsed.TotalMilliseconds / 1000);
             BytesPrSecond = items.Sum(s => s.Bytes) / (Elapsed.TotalMilliseconds / 1000);
 
-            //foreach (var statusCode in items.SelectMany(s => s.StatusCodes))
-            //{
-            //    if (StatusCodes.ContainsKey(statusCode.Key))
-            //        StatusCodes[statusCode.Key] += statusCode.Value;
-            //    else
-            //        StatusCodes.Add(statusCode.Key, statusCode.Value);
-            //}
+            foreach (var statusCode in items.SelectMany(s => s.StatusCodes).Where(c => c != 0))
+            {
+                if (StatusCodes.ContainsKey(statusCode))
+                    StatusCodes[statusCode]++;
+                else
+                    StatusCodes.Add(statusCode, 1);
+            }
 
             //foreach (var exception in items.SelectMany(s => s.Exceptions))
             //{
@@ -62,7 +62,7 @@ namespace Netling.Core.Models
             //        Exceptions.Add(exception.Key, exception.Value);
             //}
 
-            //Errors = StatusCodes.Where(s => s.Key >= 400).Sum(s => s.Value) + Exceptions.Sum(e => e.Value);
+            Errors = StatusCodes.Where(s => s.Key >= 400).Sum(s => s.Value) + Exceptions.Sum(e => e.Value);
 
             var responseTimes = GetResponseTimes(wtResult.ResponseTimes);
             if (!responseTimes.Any())
